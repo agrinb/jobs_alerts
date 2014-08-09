@@ -15,4 +15,5 @@ class User < ActiveRecord::Base
     end
   end
 
+  has_many :companies
 end
