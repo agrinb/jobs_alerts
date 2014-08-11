@@ -1,10 +1,10 @@
 class User < ActiveRecord::Base
+  has_many :companies
 
   def self.from_omniauth(auth)
     where(auth.slice(:provider, :uid)).first_or_initialize.tap do |user|
       user.provider = auth.provider
       user.uid = auth.uid
-      binding.pry
       user.email = auth.info.email
       user.first_name = auth.info.first_name
       user.last_name = auth.info.last_name
@@ -15,5 +15,5 @@ class User < ActiveRecord::Base
     end
   end
 
-  has_many :companies
+
 end

@@ -1,0 +1,11 @@
+<%= link_to "Sign out", signout_path %>
+
+<%= form_for @company do |f| %>
+  <%= f.label :url %>:
+  <%= f.text_field :url %><br />
+
+  <%= f.label :keywords %>:
+  <%= f.text_field :keywords %><br />
+
+  <%= f.submit %>
+<% end %>
