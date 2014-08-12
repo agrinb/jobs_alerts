@@ -1,22 +1,28 @@
 class CompaniesController < ApplicationController
+
   def new
     @company = Company.new
   end
 
   def create
-    @user = User.find(session[:user_id])
+    #@user = User.find(session[:user_id])
     @company = Company.new(company_params)
+    @user = User.find_by(uid: company_params['uid'])
     binding.pry
     @company.uid = @user.uid
-    @company.user_id = @user.id
-    if @company.save
-      flash[:notice] = "Company created successfully."
-      redirect_to new_company_path
-    else
-      flash[:alert] = "Company could not be saved."
-      render :new
-    end
+      if @company.save
+        respond_to do |format|
+          if @company.save
+            #format.html { redirect_to new_company_path, notice: 'Company was successfully created.' }
+            format.json { render :show, status: :created}
+          else
+            #format.html { render :new }
+            format.json { render json: @company.errors, status: :unprocessable_entity }
+          end
+        end
+      end
   end
+
 
 
     # @property = Property.find(params[:property_id])
