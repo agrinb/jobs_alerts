@@ -1,4 +1,5 @@
 class CompaniesController < ApplicationController
+  skip_before_filter  :verify_authenticity_token
 
   def new
     @company = Company.new
@@ -8,19 +9,26 @@ class CompaniesController < ApplicationController
     #@user = User.find(session[:user_id])
     @company = Company.new(company_params)
     @user = User.find_by(uid: company_params['uid'])
-    binding.pry
-    @company.uid = @user.uid
       if @company.save
         respond_to do |format|
           if @company.save
+
+            format.json { render :json => {:status => 200, :text => "ok"} }
+
             #format.html { redirect_to new_company_path, notice: 'Company was successfully created.' }
-            format.json { render :show, status: :created}
+            #format.json { render :show, status: :created}
+            #format.json { render json: @company }
           else
             #format.html { render :new }
             format.json { render json: @company.errors, status: :unprocessable_entity }
           end
         end
       end
+  end
+
+  def show
+    binding.pry
+    @company = Company.find(params[:id])
   end
 
 
@@ -39,7 +47,6 @@ class CompaniesController < ApplicationController
 
 
   def company_params
-    params.require(:company).permit(:url, :keywords, :uid, :user_id)
+    params.permit(:url, {:keywords => []}, :uid, :user_id, :user_email)
   end
-
 end
