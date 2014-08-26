@@ -1,5 +1,6 @@
 class CompaniesController < ApplicationController
   skip_before_filter  :verify_authenticity_token
+  require 'open-uri'
 
   def new
     @company = Company.new
@@ -27,8 +28,23 @@ class CompaniesController < ApplicationController
   end
 
   def show
+    company = Company.find(params[:id])
+    doc = Nokogiri::HTML(open(company.url))
+    @list = []
+    doc.traverse do |node|
+    next if node.is_a?(::Nokogiri::XML::Text)
+      unless node.text == nil
+        @list << node if node.text.include?('Developer')
+          @list.map! do |a|
+            if a.respond_to?(:children)
+              a.children[0]
+            end
+          end
+        @list
+      end
+    end
     binding.pry
-    @company = Company.find(params[:id])
+    ::Nokogiri::XML::NodeSet.new(doc, @list)
   end
 
 

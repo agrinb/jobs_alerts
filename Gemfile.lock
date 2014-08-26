@@ -82,6 +82,10 @@ GEM
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
+    nikkou (0.0.4)
+      activesupport
+      nokogiri
+      tzinfo
     nokogiri (1.6.3.1)
       mini_portile (= 0.6.0)
     oauth2 (1.0.0)
@@ -203,6 +207,7 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   launchy
+  nikkou
   omniauth-google-oauth2
   pg
   pry-rails
