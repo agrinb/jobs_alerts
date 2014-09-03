@@ -28,38 +28,59 @@ class CompaniesController < ApplicationController
   end
 
   def show
+
     company = Company.find(params[:id])
+    keywords = company.keywords
     doc = Nokogiri::HTML(open(company.url))
     @list = []
-    doc.traverse do |node|
-    next if node.is_a?(::Nokogiri::XML::Text)
-      unless node.text == nil
-        @list << node if node.text.include?('Developer')
-          @list.map! do |a|
-            if a.respond_to?(:children)
-              a.children[0]
-            end
-          end
-        @list
+
+    a_nodes = doc.css("a")
+    kwords = []
+    keywords.each do |k|
+       kwords << k.downcase
+       kwords << k.capitalize
+    end
+    kwords.each do |keyword|
+      a_nodes.each do |node|
+        if node.text.include?(keyword)
+          @list << { node.text => node['href'] }
+        end
       end
     end
-    binding.pry
-    ::Nokogiri::XML::NodeSet.new(doc, @list)
+    @list
   end
 
 
 
-    # @property = Property.find(params[:property_id])
-    # @appointment = Appointment.new(appointment_params)
-    # @appointment.property = @property
-    # ApptMailer.send_notify_agents(@appointment)
-    # if @appointment.save
-    #   flash[:notice] = "Appointment created successfully."
-    #   redirect_to property_path(@property)
-    # else
-    #   flash[:alert] = "Appointment could not be saved."
-    #   render :new
+
+
+
+
+
+
+
+
+
+
+
+    # doc.traverse do |node|
+    # next if node.is_a?(::Nokogiri::XML::Text)
+    # binding.pry
+    #   unless node.text == nil
+    #     binding.pry
+    #     @list << node if node.text.include?('Developer')
+    #     binding.pry
+    #       @list.map! do |a|
+    #         if a.respond_to?(:children)
+    #           a.children[0]
+    #         end
+    #       end
+    #     @list
+    #   end
     # end
+  #   binding.pry
+  #   ::Nokogiri::XML::NodeSet.new(doc, @list)
+  # end
 
 
   def company_params
