@@ -50,7 +50,41 @@ class CompaniesController < ApplicationController
     @list
   end
 
+  def fetch_html(company)
+    doc = Nokogiri::HTML(open(company.url))
+  end
 
+
+  end
+
+  def find_jobs
+    users = User.all
+    companies = users.map! { |user| user.companies }
+    user_jobs = []
+    companies.each do |company|
+      keywords = company.keywords
+      doc = Nokogiri::HTML(open(company.url))
+      a_nodes = doc.css("a")
+      kwords = []
+      keywords.each do |k|
+         kwords << k.downcase
+         kwords << k.capitalize
+      end
+      kwords.each do |keyword|
+        a_nodes.each do |node|
+          if node.text.include?(keyword)
+            user_jobs <<
+              { company.user =>
+                { company.company =>
+                  { node.text => node['href'] }
+                }
+              }
+          end
+        end
+      end
+    end
+    user_jobs
+  end
 
 
 
