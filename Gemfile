@@ -24,6 +24,7 @@ gem 'rack-cors', :require => 'rack/cors'
 gem 'nikkou'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0',          group: :doc
+gem 'whenever', '~> 0.9.2'
 
 # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
 gem 'spring',        group: :development
