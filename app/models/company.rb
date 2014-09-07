@@ -1,10 +1,14 @@
+require 'open-uri'
+
 class Company < ActiveRecord::Base
-  validates :uid, presecnce: true
+  validates :uid, presence: true
   validates :user_id, presence: true
   validates :url, presence: true
   validates :keywords, presence: true
   serialize :keywords
   belongs_to :user
+
+
 
   def fetch_html(company)
     doc = Nokogiri::HTML(open(company.url))
@@ -16,8 +20,7 @@ class Company < ActiveRecord::Base
     users = User.all
     companies = users.map { |user| user.companies }
     user_jobs = []
-    binding.pry
-    companies.each do |company|
+    companies[0].each do |company|
       keywords = company.keywords
       doc = Nokogiri::HTML(open(company.url))
       a_nodes = doc.css("a")
@@ -29,16 +32,18 @@ class Company < ActiveRecord::Base
       kwords.each do |keyword|
         a_nodes.each do |node|
           if node.text.include?(keyword)
+            job = Job.create(company_id: company.id, url: node['href'], title: node.text)
             user_jobs <<
               { company.user =>
                 { company.company =>
-                  { node.text => node['href'] }
+                  { job.title => job.url }
                 }
               }
           end
         end
       end
     end
+    binding.pry
     user_jobs
   end
 end

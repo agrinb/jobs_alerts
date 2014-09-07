@@ -9,7 +9,7 @@ class CompaniesController < ApplicationController
   def create
     #@user = User.find(session[:user_id])
     @company = Company.new(company_params)
-    @user = User.find_by(uid: company_params['uid'])
+    @company.user = User.find_by(uid: company_params['uid'])
     binding.pry
       if @company.save
         respond_to do |format|
