@@ -10,7 +10,6 @@ class CompaniesController < ApplicationController
     #@user = User.find(session[:user_id])
     @company = Company.new(company_params)
     @company.user = User.find_by(uid: company_params['uid'])
-    binding.pry
       if @company.save
         respond_to do |format|
           if @company.save
@@ -85,6 +84,6 @@ class CompaniesController < ApplicationController
 
 
   def company_params
-    params.permit(:url, {:keywords => []}, :uid, :user_id, :user_email)
+    params.permit(:url, {:keywords => []}, :uid, :user_id, :user_email, :company)
   end
 end
