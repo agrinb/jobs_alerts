@@ -10,6 +10,8 @@ class CompaniesController < ApplicationController
     @company = Company.new(company_params)
     binding.pry
     @company.user = User.find_by(uid: company_params['uid'])
+    @company.last_fetch = Nokogiri::HTML(open(company_params['url']))
+    binding.pry
       if @company.save
         respond_to do |format|
           if @company.save

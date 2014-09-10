@@ -37,5 +37,5 @@ links.each do |link|
   companies << Company.create(url: k, keywords: v, name: name[1], user_id: 1, uid: "101147046698959722496" )
   end
 end
-binding.pry
+
 
