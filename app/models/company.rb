@@ -8,6 +8,38 @@ class Company < ActiveRecord::Base
   serialize :keywords
   belongs_to :user
 
+  def self.user_links(user)
+    user.companies.each do |company|
+      find_link(company)
+    end
+  end
+
+  def self.find_link(company)
+    links = []
+    keywords = company.keywords
+    last_fetch = Nokogiri::HTML(company.last_fetch)
+    a_nodes = last_fetch.css("a")
+    kwords = []
+    keywords.each do |k|
+      kwords << k.downcase
+      kwords << k.capitalize
+    end
+    kwords.each do |keyword|
+      a_nodes.each do |node|
+        if node.text.include?(keyword)
+          job = Job.create(company_id: company.id, url: node['href'], title: node.text)
+            links <<
+              { company.user =>
+                { company.name =>
+                  { job.title => job.url }
+                }
+              }
+        end
+      end
+    end
+    binding.pry
+    links
+  end
 
   def self.last_fetch(company)
     last_fetch = Nokogiri::HTML(company.last_fetch)
@@ -39,36 +71,37 @@ class Company < ActiveRecord::Base
 
   def self.find_jobs
     users = User.all
-    companies = users.map { |user| user.companies }
-    user_jobs = []
-    companies[0].each do |company|
-      keywords = company.keywords
-      doc = Nokogiri::HTML(open(company.url))
-      a_nodes = doc.css("a")
-      kwords = []
-      keywords.each do |k|
-         kwords << k.downcase
-         kwords << k.capitalize
-      end
-      kwords.each do |keyword|
-        a_nodes.each do |node|
-          if node.text.include?(keyword) && not_in_last_fetch(company, node)
-         # if node.text.include?(keyword)
-            job = Job.create(company_id: company.id, url: node['href'], title: node.text)
-            user_jobs <<
-              { company.user =>
-                { company.name =>
-                  { job.title => job.url }
-                }
-              }
-          end
-        end
-      end
-      company.last_fetch = Nokogiri::HTML(open(company.url)).to_s
-      company.save
+    users.each do |user|
+      user_links(user)
     end
-    binding.pry
-    user_jobs
   end
+
+
+    # users = User.all
+    # companies = users.map { |user| user.companies }
+    # user_jobs = []
+    # companies[0].each do |company|
+    #   keywords = company.keywords
+    #   doc = Nokogiri::HTML(open(company.url))
+    #   a_nodes = doc.css("a")
+    #   kwords = []
+    #   keywords.each do |k|
+    #      kwords << k.downcase
+    #      kwords << k.capitalize
+    #   end
+    #   kwords.each do |keyword|
+    #     a_nodes.each do |node|
+    #       if node.text.include?(keyword) && not_in_last_fetch(company, node)
+    #      # if node.text.include?(keyword)
+
+    #       end
+    #     end
+    #   end
+    #   company.last_fetch = Nokogiri::HTML(open(company.url)).to_s
+    #   company.save
+    # end
+    # binding.pry
+    # user_jobs
+    # end
 
 end
