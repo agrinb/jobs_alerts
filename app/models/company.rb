@@ -7,14 +7,16 @@ class Company < ActiveRecord::Base
   validates :keywords, presence: true
   serialize :keywords
   belongs_to :user
+  has_many :jobs, dependent: :destroy
 
-  def self.user_links(user)
-    user.companies.each do |company|
-      find_link(company)
+  def self.fetch_dom
+    Company.all.each do |company|
+      company.last_fetch = Nokogiri::HTML(open(company.url))
+      company.save
     end
   end
 
-  def self.find_link(company)
+  def self.find_links(company)
     links = []
     keywords = company.keywords
     last_fetch = Nokogiri::HTML(company.last_fetch)
@@ -28,44 +30,20 @@ class Company < ActiveRecord::Base
       a_nodes.each do |node|
         if node.text.include?(keyword)
           job = Job.create(company_id: company.id, url: node['href'], title: node.text)
-            links <<
-              { company.user =>
-                { company.name =>
-                  { job.title => job.url }
-                }
-              }
+          links << job
         end
       end
     end
-    binding.pry
     links
   end
 
-  def self.last_fetch(company)
-    last_fetch = Nokogiri::HTML(company.last_fetch)
-    previous = []
-    keywords = company.keywords
-    a_nodes = last_fetch.css("a")
-    kwords = []
-    keywords.each do |k|
-       kwords << k.downcase
-       kwords << k.capitalize
+   def self.user_links(user)
+    new_links = []
+    user.companies.each do |company|
+      links = find_links(company)
+      links.select {|link| link.created_at - company.created_at > 1.day }
     end
-    kwords.each do |keyword|
-      a_nodes.each do |node|
-        #binding.pry
-        if node.text.include?(keyword)
-          previous << node['href']
-        end
-      end
-    end
-    binding.pry
-    previous
-  end
 
-  def self.not_in_last_fetch(company, node)
-    binding.pry
-    !last_fetch(company).include?(node['href'])
   end
 
 

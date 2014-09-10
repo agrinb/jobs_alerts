@@ -10,11 +10,7 @@
 links = [
           { "http://www.squarespace.com/about/careers " => ["engineer", "software", "advisor"]},
 
-          { "https://a127-jobs.nyc.gov/jobsearch.html?category=CAS" => ["analyst", "assistant"]},
-
           { "http://jobs.intuit.com/careers/customer-service-and-support-jobs" => ["quality", "tax"]},
-
-          { "https://www.facebook.com/careers/teams/product-management" => ["product"]},
 
           {"http://www.hugeinc.com/careers/technology" => ["Analyst", "Engineer"]},
 

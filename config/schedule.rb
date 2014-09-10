@@ -8,7 +8,11 @@
 # set :output, "/path/to/my/cron_log.log"
 #
 every 2.hours do
-  runner "Companies.find_jobs"
+  runner "Company.find_jobs"
+end
+
+every 1.day do
+  runner "Company.fetch_dom"
 end
 #
 # every 4.days do
