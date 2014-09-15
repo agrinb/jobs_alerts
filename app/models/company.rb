@@ -38,12 +38,14 @@ class Company < ActiveRecord::Base
   end
 
    def self.user_links(user)
+    binding.pry
     new_links = []
     user.companies.each do |company|
       links = find_links(company)
-      links.select {|link| link.created_at - company.created_at > 1.day }
+      new_links = links.select {|link| link.created_at - company.created_at > 1.day }
+    binding.pry
     end
-
+    new_links
   end
 
 
