@@ -29,22 +29,21 @@ class CompaniesController < ApplicationController
     company = Company.find(params[:id])
     keywords = company.keywords
     doc = Nokogiri::HTML(open(company.url))
-    @list = []
-
     a_nodes = doc.css("a")
     kwords = []
     keywords.each do |k|
        kwords << k.downcase
        kwords << k.capitalize
     end
+    doc_links = []
     kwords.each do |keyword|
       a_nodes.each do |node|
         if node.text.include?(keyword)
-          @list << { node.text => node['href'] }
+          doc_links << { node.text => node['href'] }
         end
       end
     end
-    @list
+    doc_links
   end
 
 

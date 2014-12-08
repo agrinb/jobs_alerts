@@ -1,4 +1,3 @@
 class Job < ActiveRecord::Base
-  has_many :users, through: :companies
-
+  belongs_to :job_group
 end

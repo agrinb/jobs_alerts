@@ -1,6 +1,7 @@
 class User < ActiveRecord::Base
   has_many :companies
-  has_many :jobs, through: :companies
+  has_many :job_groups
+
 
   def self.from_omniauth(auth)
     where(auth.slice(:provider, :uid)).first_or_initialize.tap do |user|
@@ -16,5 +17,14 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.find_jobs
+    users = User.all
+    users.each do |user|
+      Company.user_links(user)
+    end
+  end
+
+  def self.notify_all
+    binding.pry
 
 end

@@ -9,27 +9,28 @@ class Company < ActiveRecord::Base
   belongs_to :user
   has_many :jobs, dependent: :destroy
 
-  def self.fetch_dom
-    Company.all.each do |company|
-      company.last_fetch = Nokogiri::HTML(open(company.url))
-      company.save
-    end
-  end
 
-  def self.find_links(company)
-    links = []
-    keywords = company.keywords
-    last_fetch = Nokogiri::HTML(company.last_fetch)
-    a_nodes = last_fetch.css("a")
+  def kwords 
     kwords = []
     keywords.each do |k|
       kwords << k.downcase
       kwords << k.capitalize
     end
+    kwords
+  end 
+  
+
+  def find_links(job_group)
+    links = []
+    last_fetch = Nokogiri::HTML(open(self.url))
+    a_nodes = last_fetch.css("a")
     kwords.each do |keyword|
-      a_nodes.each do |node|
-        if node.text.include?(keyword)
-          job = Job.create(company_id: company.id, url: node['href'], title: node.text)
+      a_nodes.children.each_with_index do |node|
+       if node.text.include?(keyword)
+          binding.pry
+          job = Job.find_or_initialize_by(url: node['href'], title: node.text)
+          job.update_attributes(job_group_id: job_group.id, company_id: self.id)
+          job.save!
           links << job
         end
       end
@@ -37,26 +38,17 @@ class Company < ActiveRecord::Base
     links
   end
 
-   def self.user_links(user)
-    binding.pry
-    new_links = []
-    user.companies.each do |company|
-      links = find_links(company)
-      new_links = links.select {|link| link.created_at - company.created_at > 1.day }
-    binding.pry
+  def self.user_links(user)
+    links = []
+    job_group = JobGroup.create(user_id: user.id)
+    user.companies.each do |c|
+      c.find_links(job_group)
     end
-    new_links
+    User.notify_all
   end
 
 
-  def self.find_jobs
-    users = User.all
-    users.each do |user|
-      user_links(user)
-    end
-  end
-
-
+  
     # users = User.all
     # companies = users.map { |user| user.companies }
     # user_jobs = []
