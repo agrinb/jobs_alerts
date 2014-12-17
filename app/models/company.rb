@@ -20,20 +20,14 @@ class Company < ActiveRecord::Base
   end 
   
 
-  def find_links
+  def extract_jobs
     jobs_array = []
     last_fetch = Nokogiri::HTML(open(self.url))
     a_nodes = last_fetch.css("a")
     kwords.each do |keyword|
       a_nodes.children.each_with_index do |node, i|
        if node.text.include?(keyword)
-          binding.pry
-          job_url = process_url(node.parent['href'])   
-          binding.pry
-          job = Job.find_or_initialize_by(url: job_url, title: node.text)
-          
-          job.update_attributes(job_group_id: job_group.id, company_id: self.id)
-          job.save!
+          job = get_job(node)
           jobs_array << job
         end
       end
@@ -43,7 +37,7 @@ class Company < ActiveRecord::Base
 
   def process_url(link)
     source_type
-    if source_type = "craigslist"
+    if source_type == "craigslist"
       process_cl_url(link)
     else 
       process_other_urls
@@ -62,10 +56,18 @@ class Company < ActiveRecord::Base
   def process_cl_url(link)
     base_url = url.split('/search').first
     node_url = link
-    binding.pry
     mod_url = base_url << node_url
   end
 
+  def get_job(node)
+    job_url = process_url(node.parent['href'])   
+    check_existing_jobs = Job.where("url = ? AND created_at >= ?", job_url, Time.now - 1.week)
+    unless check_existing_jobs.any?
+      job = Job.create(url: job_url, title: node.text, company_id: id)
+    else 
+      check_existing_jobs.first
+    end
+  end
 
   #  def process_jobs(jobs_array)
   #   if self.url.include?('craigslist.org/search')
@@ -90,44 +92,4 @@ class Company < ActiveRecord::Base
     end
     processed_jobs
   end
-
-
-  def self.user_links(user)
-    links = []
-    job_group = JobGroup.create(user_id: user.id)
-    user.companies.each do |c|
-      c.find_links(job_group)
-    end
-    User.notify_all
-  end
-
-
-  
-    # users = User.all
-    # companies = users.map { |user| user.companies }
-    # user_jobs = []
-    # companies[0].each do |company|
-    #   keywords = company.keywords
-    #   doc = Nokogiri::HTML(open(company.url))
-    #   a_nodes = doc.css("a")
-    #   kwords = []
-    #   keywords.each do |k|
-    #      kwords << k.downcase
-    #      kwords << k.capitalize
-    #   end
-    #   kwords.each do |keyword|
-    #     a_nodes.each do |node|
-    #       if node.text.include?(keyword) && not_in_last_fetch(company, node)
-    #      # if node.text.include?(keyword)
-
-    #       end
-    #     end
-    #   end
-    #   company.last_fetch = Nokogiri::HTML(open(company.url)).to_s
-    #   company.save
-    # end
-    # binding.pry
-    # user_jobs
-    # end
-
 end
