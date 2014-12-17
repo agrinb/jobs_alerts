@@ -27,6 +27,7 @@ class CompaniesController < ApplicationController
 
   def show
     @company = Company.find(params[:id])
+    @company.find_jobs
     keywords = @company.keywords
     doc = Nokogiri::HTML(open(@company.url))
     a_nodes = doc.css("a")
@@ -68,7 +69,6 @@ class CompaniesController < ApplicationController
       processed_jobs << modified_job
     end
     processed_jobs
-    binding.pry
   end
 
 
