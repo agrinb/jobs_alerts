@@ -1,3 +1,7 @@
+require 'pusher'
+
+Pusher.url = "http://6820c0d85f970bbf1bb7:7cf35e3c19a2f53595d4@api.pusherapp.com/apps/100611"
+
 class User < ActiveRecord::Base
   has_many :companies
   has_many :job_groups
@@ -18,13 +22,20 @@ class User < ActiveRecord::Base
   end
 
   def self.find_jobs
+    jobs = []
     users = User.all
     users.each do |user|
-      Company.user_links(user)
+      user.companies.each do |company|
+        jobs << company.extract_jobs
+      end
+      notify_user(user.id, jobs)
     end
   end
 
-  def self.notify_all
+  def self.notify_user(user_id, jobs)
     binding.pry
+    chrome.gcm.register(array of string senderIds, function callback)
+    Pusher["#{user_id}"].trigger('my_event', jobs.first.to_json)
+  end
 
 end

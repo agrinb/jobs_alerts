@@ -32,7 +32,7 @@ class Company < ActiveRecord::Base
         end
       end
     end
-    process_jobs(links)
+    jobs_array
   end
 
   def process_url(link)

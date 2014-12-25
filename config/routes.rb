@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get 'auth/failure', to: redirect('/')
   get 'signout', to: 'sessions#destroy', as: 'signout'
   resources :companies, only: [:new, :create, :show]
+  resources :jobs, only: [:index]
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
