@@ -33,8 +33,6 @@ class User < ActiveRecord::Base
   end
 
   def self.notify_user(user_id, jobs)
-    binding.pry
-    chrome.gcm.register(array of string senderIds, function callback)
     Pusher["#{user_id}"].trigger('my_event', jobs.first.to_json)
   end
 
