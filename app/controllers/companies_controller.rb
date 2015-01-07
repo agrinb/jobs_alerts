@@ -7,23 +7,38 @@ class CompaniesController < ApplicationController
   end
 
   def create
-    @company = Company.new(company_params)
+    @company = Company.new
+    user = User.find_or_create_by(uid: company_params['uid'])
     binding.pry
-    @company.user = User.find_by(uid: company_params['uid'])
-    @company.last_fetch = Nokogiri::HTML(open(company_params['url']))
+    @company.assign_attributes({ user_id: user.id, uid: user.uid, job_url: company_params['job_url'], name: company_params['name'], keywords: company_params['keywords'], uid: company_params['uid'], url: company_params['url']})
     binding.pry
     if @company.save
       respond_to do |format|
-        if @company.save
-
-          format.json { render :json => {:status => 200, :text => "ok"} }
-
-        else
-          format.json { render json: @company.errors, status: :unprocessable_entity }
-        end
+        format.json { render :json => {:status => 200, :text => "ok"} }
+      end
+    else
+      respond_to do |format|
+        format.json { render json: @company.errors, status: :unprocessable_entity }
       end
     end
   end
+ 
+
+  # def create
+  #   @company = Company.new
+  #   @company.user = User.find_by(uid: company_params['uid'])
+  #   @company.last_fetch = Nokogiri::HTML(open(company_params['url']))
+  #   binding.pry
+  #   if @company.save
+  #     respond_to do |format|
+  #       format.json { render :json => {:status => 200, :text => "ok"} }
+  #     end
+  #   else
+  #     respond_to do |format|
+  #      format.json { render json: @company.errors, status: :unprocessable_entity }
+  #    end
+  #   end
+  # end
 
   def show
     @company = Company.find(params[:id])
@@ -75,6 +90,6 @@ class CompaniesController < ApplicationController
 
 
   def company_params
-    params.permit(:url, {:keywords => []}, :uid, :user_id, :user_email, :name)
+    params.permit(:url, {:keywords => []}, :uid, :user_id, :user_email, :name, :job_url)
   end
 end

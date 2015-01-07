@@ -92,4 +92,20 @@ class Company < ActiveRecord::Base
     end
     processed_jobs
   end
+
+  def prep_query_urls
+    job_url(split)
+  end
+
+  def prep_sample_urls
+    arr = job_url.split('/')
+    3.times { arr.shift }
+    urls = []
+    single_url = ""
+    arr.each do | elem |
+      single_url << "/" << elem 
+    end
+  end
+
+
 end
