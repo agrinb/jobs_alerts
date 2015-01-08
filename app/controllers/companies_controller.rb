@@ -1,24 +1,24 @@
 class CompaniesController < ApplicationController
-  skip_before_filter  :verify_authenticity_token
   require 'open-uri'
+  skip_before_filter  :verify_authenticity_token
+  
 
   def new
     @company = Company.new
   end
 
   def create
+    binding.pry
     @company = Company.new
     user = User.find_or_create_by(uid: company_params['uid'])
-    binding.pry
     @company.assign_attributes({ user_id: user.id, uid: user.uid, job_url: company_params['job_url'], name: company_params['name'], keywords: company_params['keywords'], uid: company_params['uid'], url: company_params['url']})
-    binding.pry
     if @company.save
       respond_to do |format|
         format.json { render :json => {:status => 200, :text => "ok"} }
       end
     else
       respond_to do |format|
-        format.json { render json: @company.errors, status: :unprocessable_entity }
+       format.json { render json: @company.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -44,7 +44,13 @@ class CompaniesController < ApplicationController
     @company = Company.find(params[:id])
     @company.find_jobs
     keywords = @company.keywords
-    doc = Nokogiri::HTML(open(@company.url))
+    
+    begin
+      binding.pry
+      doc = Nokogiri::HTML(open(@company.url))
+    rescue Errno::ENOENT => e
+      $stderr.puts "Caught the exception: #{e}"
+    end
     a_nodes = doc.css("a")
     kwords = []
     keywords.each do |k|

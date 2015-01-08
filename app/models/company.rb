@@ -20,27 +20,37 @@ class Company < ActiveRecord::Base
   end 
   
 
-  def extract_jobs
+  def process_dom_for_jobs
     jobs_array = []
-    last_fetch = Nokogiri::HTML(open(self.url))
-    a_nodes = last_fetch.css("a")
-    kwords.each do |keyword|
-      a_nodes.children.each_with_index do |node, i|
-       if node.text.include?(keyword)
-          job = get_job(node)
-          jobs_array << job
+    begin
+    dom = Nokogiri::HTML(open(self.url))
+    rescue Errno::ENOENT => e
+      $stderr.puts "Caught the exception: #{e}"
+    end
+    unless !dom
+      a_nodes = dom.css("a")
+      kwords.each do |keyword|
+        a_nodes.children.each do |node|
+          ### TEMP
+         if node.text.include?(keyword) && !self.url.include?("craigslist")
+          ###
+            binding.pry
+            job = get_job(node)
+            jobs_array << job
+          end
         end
       end
     end
     jobs_array
   end
 
-  def process_url(link)
-    source_type
+
+
+  def process_url(url)
     if source_type == "craigslist"
-      process_cl_url(link)
+      process_cl_url(url)
     else 
-      process_other_urls
+      process_other_url(url)
     end
   end
 
@@ -53,13 +63,14 @@ class Company < ActiveRecord::Base
     end
   end
 
-  def process_cl_url(link)
+  def process_cl_url(path)
     base_url = url.split('/search').first
-    node_url = link
-    mod_url = base_url << node_url
+    #node_url = link
+    mod_url = base_url << path
   end
 
-  def get_job(node)
+  def get_job(node)    
+    binding.pry
     job_url = process_url(node.parent['href'])   
     check_existing_jobs = Job.where("url = ? AND created_at >= ?", job_url, Time.now - 1.week)
     unless check_existing_jobs.any?
@@ -77,7 +88,22 @@ class Company < ActiveRecord::Base
   #   end
   # end
 
-  def process_other_urls(url)
+
+  def extract_domain(url)
+    uri = URI.parse(url)
+    uri = URI.parse("http://#{url}") if uri.scheme.nil?
+    uri.scheme + "://" + uri.host
+  end
+
+
+  def process_other_url(path)
+    if path.include?('http')
+      path 
+    else
+      base_url = extract_domain(url)
+      #node_url = link
+      mod_url = base_url << path
+    end
   end
 
   def process_cl_urls(jobs_array)
@@ -91,20 +117,6 @@ class Company < ActiveRecord::Base
       processed_jobs << modified_job
     end
     processed_jobs
-  end
-
-  def prep_query_urls
-    job_url(split)
-  end
-
-  def prep_sample_urls
-    arr = job_url.split('/')
-    3.times { arr.shift }
-    urls = []
-    single_url = ""
-    arr.each do | elem |
-      single_url << "/" << elem 
-    end
   end
 
 

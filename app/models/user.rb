@@ -31,7 +31,7 @@ class User < ActiveRecord::Base
     users = User.all
     users.each do |user|
       user.companies.each do |company|
-        jobs << company.extract_jobs
+        jobs << company.process_dom_for_jobs
       end
       notify_user(user.id, jobs)
     end
