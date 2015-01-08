@@ -27,14 +27,12 @@ class Company < ActiveRecord::Base
     rescue Errno::ENOENT => e
       $stderr.puts "Caught the exception: #{e}"
     end
-    unless !dom
+    unless !dom 
       a_nodes = dom.css("a")
       kwords.each do |keyword|
         a_nodes.children.each do |node|
-          ### TEMP
-         if node.text.include?(keyword) && !self.url.include?("craigslist")
-          ###
-            binding.pry
+         if node.text.include?(keyword)
+
             job = get_job(node)
             jobs_array << job
           end
@@ -70,11 +68,10 @@ class Company < ActiveRecord::Base
   end
 
   def get_job(node)    
-    binding.pry
     job_url = process_url(node.parent['href'])   
     check_existing_jobs = Job.where("url = ? AND created_at >= ?", job_url, Time.now - 1.week)
     unless check_existing_jobs.any?
-      job = Job.create(url: job_url, title: node.text, company_id: id)
+      job = Job.create(url: job_url, title: node.text, company_id: id, user_id: self.user_id)
     else 
       check_existing_jobs.first
     end
