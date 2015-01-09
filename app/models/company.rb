@@ -26,13 +26,14 @@ class Company < ActiveRecord::Base
     dom = Nokogiri::HTML(open(self.url))
     rescue Errno::ENOENT => e
       $stderr.puts "Caught the exception: #{e}"
+    rescue OpenURI::HTTPError => e
+      $stderr.puts "Caught the exception: #{e}"
     end
-    unless !dom 
+    unless !dom
       a_nodes = dom.css("a")
       kwords.each do |keyword|
         a_nodes.children.each do |node|
          if node.text.include?(keyword)
-
             job = get_job(node)
             jobs_array << job
           end
@@ -54,7 +55,7 @@ class Company < ActiveRecord::Base
 
 
   def source_type
-    if self.url.include?('craigslist.org/search')
+    if self.url.include?('craigslist.org/search') || self.url.include?('linkedin')
       "craigslist"
     else
       "not craigslist"
@@ -62,7 +63,7 @@ class Company < ActiveRecord::Base
   end
 
   def process_cl_url(path)
-    base_url = url.split('/search').first
+    base_url = extract_domain(url)
     #node_url = link
     mod_url = base_url << path
   end

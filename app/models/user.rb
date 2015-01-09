@@ -5,6 +5,7 @@ Pusher.url = "http://6820c0d85f970bbf1bb7:7cf35e3c19a2f53595d4@api.pusherapp.com
 class User < ActiveRecord::Base
   has_many :companies
   has_many :job_groups
+  has_many :jobs
 
 
   # def self.from_omniauth(auth)
@@ -33,12 +34,12 @@ class User < ActiveRecord::Base
       user.companies.each do |company|
         jobs << company.process_dom_for_jobs
       end
-      notify_user(user.id, jobs)
+      user.notify_user(user.uid, jobs)
     end
   end
 
-  def self.notify_user(user_id, jobs)
-    Pusher["#{user_id}"].trigger('my_event', jobs.first.to_json)
+  def notify_user(uid, jobs)
+    Pusher["#{uid}"].trigger('jobs_json', jobs.first.to_json)
   end
 
 end
