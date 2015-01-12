@@ -10,7 +10,7 @@ class CompaniesController < ApplicationController
   def create
     @company = Company.new
     user = User.find_or_create_by(uid: company_params['uid'])
-    @company.assign_attributes({ user_id: user.id, uid: user.uid, job_url: company_params['job_url'], name: company_params['name'], keywords: company_params['keywords'], uid: company_params['uid'], url: company_params['url']})
+    @company.assign_attributes({ user_id: user.id, uid: user.uid, name: company_params['name'], keywords: company_params['keywords'], url: company_params['url']})
     if @company.save
       respond_to do |format|
         format.json { render :json => {:status => 200, :text => "ok"} }
