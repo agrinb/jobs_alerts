@@ -1,7 +1,6 @@
 require 'open-uri'
 
 class Company < ActiveRecord::Base
-  validates :uid, presence: true
   validates :user_id, presence: true
   validates :url, presence: true
   validates :keywords, presence: true
@@ -9,6 +8,7 @@ class Company < ActiveRecord::Base
   belongs_to :user
   has_many :jobs, dependent: :destroy
 
+  
 
   def kwords 
     kwords = []
@@ -55,7 +55,7 @@ class Company < ActiveRecord::Base
 
 
   def source_type
-    if self.url.include?('craigslist.org/search') || self.url.include?('linkedin')
+    if self.url.include?('craigslist.org/search') 
       "craigslist"
     else
       "not craigslist"
