@@ -9,25 +9,6 @@ class User < ActiveRecord::Base
   has_many :jobs
 
 
-  # def self.from_omniauth(auth)
-  #   puts auth
-  #   where(auth.slice(:provider, :uid)).first_or_initialize.tap do |user|
-  #     user.provider = auth.provider
-  #     user.uid = auth.uid
-  #     user.email = auth.info.email
-  #     user.first_name = auth.info.first_name
-  #     user.last_name = auth.info.last_name
-  #     user.avatar = auth.info.image
-  #     user.oauth_token = auth.credentials.token
-  #     user.oauth_expires_at = Time.at(auth.credentials.expires_at)
-  #     user.save!
-  #   end
-  # end
-
-  # def create
-  #   @user = User.create(uid: )
-  # end
-
   def self.find_jobs
     jobs = []
     users = User.all
@@ -53,8 +34,10 @@ class User < ActiveRecord::Base
     status = false
     last_job_id = self.jobs.last.id 
     self.companies.each do |company|
-      jobs << company.process_dom_for_jobs
+      company.process_dom_for_jobs
     end
+    new_jobs = Job.where("user_id = ?", id).order(created_at: :desc).take(10)
+    jobs << new_jobs
     current_job_id = self.jobs.last.id 
     if current_job_id > last_job_id
       status = true

@@ -24,23 +24,6 @@ class CompaniesController < ApplicationController
   end
  
 
-  # def create
-  #   @company = Company.new
-  #   @company.user = User.find_by(uid: company_params['uid'])
-  #   @company.last_fetch = Nokogiri::HTML(open(company_params['url']))
-  #   binding.pry
-  #   if @company.save
-  #     respond_to do |format|
-  #       format.json { render :json => {:status => 200, :text => "ok"} }
-  #     end
-  #   else
-  #     respond_to do |format|
-  #      format.json { render json: @company.errors, status: :unprocessable_entity }
-  #    end
-  #   end
-  # end
-  ##
-
   # def show
   #   @company = Company.find(params[:id])
   #   @company.find_jobs
@@ -68,29 +51,6 @@ class CompaniesController < ApplicationController
   #   process_jobs(jobs_array, @company)  
   # end
 
-  # def process_jobs(jobs_array, company)
-  #   if company.url.include?('craigslist.org/search')
-  #     process_cl_urls(jobs_array, @company.url)
-  #   else
-  #     process_other_urls(company)
-  #   end
-  # end
-
-  # def process_other_urls
-  # end
-
-  # def process_cl_urls(jobs_array, url)
-  #   processed_jobs = []
-  #   jobs_array.each do |job|
-  #     unless job.values.include?('http://')
-  #       base_url = url.split('/search').first
-  #       mod_url = base_url << job.values.first
-  #       modified_job = { job.keys.first => mod_url }
-  #     end
-  #     processed_jobs << modified_job
-  #   end
-  #   processed_jobs
-  # end
 
 
   def company_params
