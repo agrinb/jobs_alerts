@@ -32,7 +32,13 @@ class User < ActiveRecord::Base
   def find_my_jobs
     jobs = []
     status = false
-    last_job_id = self.jobs.last.id 
+    if self.jobs.empty?
+      last_job_id = 1 
+      current_job_id = 1
+    else
+      last_job_id = self.jobs.last.id 
+      current_job_id = self.jobs.last.id 
+    end 
     self.companies.each do |company|
       company.process_dom_for_jobs
     end
