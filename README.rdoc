@@ -1,7 +1,8 @@
 JobSniper App 
 ====================
-### Back-end for Chrome Extension 
-### Install Here: https://chrome.google.com/webstore/detail/jobsniper/gncmkinmiecbhdagcelpalalkcdnfplg?hl=en&gl=US
+
+Back-end for Chrome Extension 
+Install Here: https://chrome.google.com/webstore/detail/jobsniper/gncmkinmiecbhdagcelpalalkcdnfplg?hl=en&gl=US
 
 Currently the app supports a limited amount of sites due to the wide variety amongst career pages companies employ and third apps for recruiting.
 However, support for more websites is coming soon.
