@@ -23,6 +23,7 @@ class Company < ActiveRecord::Base
   def process_dom_for_jobs
     jobs_array = []
     begin
+    puts self.url
     dom = Nokogiri::HTML(open(self.url))
     rescue Errno::ENOENT => e
       $stderr.puts "Caught the exception: #{e}"
